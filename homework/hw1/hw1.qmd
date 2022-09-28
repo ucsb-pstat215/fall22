@@ -1,0 +1,53 @@
+---
+title: "Homework 1"
+author: "Alex Franks"
+date: '2022-09-30'
+output: pdf_document
+---
+
+Due Friday 10/7 end of day. The solution file should include a `.qmd` file rendered to `pdf` and any additional files needed. 
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Theory problems:
+
+## 1. Exponential model with conjugate prior distribution:
+
+**1a** Show that if $y|\theta$ is exponentially distributed with rate $\theta$, then the gamma prior distribution is conjugate for inferences about $\theta$ given an iid sample of $y$ values.
+
+**1b** Show that the equivalent prior specification for the mean, $\phi=1/\theta$, is inverse-gamma.  (That is, derive the latter density function.)
+
+**1c** The length of life of a light bulb manufactured by a certain process has an exponential distribution with unknown rate $\theta$.  Suppose the prior distribution for $\theta$ is a gamma distribution with coefficient of variation $0.5$.  (The *coefficient of variation* is defined as the standard deviation divided by the mean.) A random sample of light bulbs is to be tested and the lifetime
+of each obtained.  If the coefficient of variation of the distribution of $\theta$ is to be reduced to $0.1$, how many light bulbs need to be tested?
+
+
+## 2. A Mixture Prior for Heart Transplant Surgeries
+
+A hospital in the United States wants to evaluate their success rate of heart transplant surgeries. We observe the number of deaths, $y$, in a number of heart transplant surgeries. Let $y \sim \text{Pois}(\nu\lambda)$ where $\lambda$ is the rate of deaths/patient and $\nu$ is the exposure (total number of heart transplant patients).  When measuring rare events with low rates, maximum likelihood estimation can be notoriously bad and we have good prior knowledge to incorporate. To construct your prior distribution you talk to two experts.  The first expert thinks that $p_1(\lambda)$ with a $\text{gamma}(3, 2000)$ density is a reasonable prior. The second expert thinks that $p_2(\lambda)$ with a $\text{gamma}(7, 1000)$ density is a reasonable prior distribution.  You decide that each expert is equally credible so you combine their prior distributions into a mixture prior with equal weights: $p(\lambda) = 0.5 * p_1(\lambda) + 0.5 * p_2(\lambda)$
+
+**2a.** What does each expert think the mean rate is, _a priori_? Which expert is more confident about the value of $\lambda$ a priori (i.e. before seeing any data)?
+
+
+
+**2b** Suppose the hospital has $y=8$ deaths with an exposure of $\nu=1767$ surgeries performed.  Write the posterior distribution up to a proportionality constant then solve for the proportionality constant (be careful about what constants a proportionality constant in this problem!).  Solve for $K = \int L(\lambda; y)p(\lambda) d\lambda$, the normalizing constant for the density.  This constant will involve $\Gamma$ functions.  Compute this posterior density and clearly express the density as a mixture of two gamma distributions. 
+
+**2c**.  Plot this *normalized* posterior density and and add a vertical line at the MLE. Add the prior density to the plot for comparison, in a different color.    
+
+# Computing problem / Applied problem
+
+## 3. Visualizing Election Results
+
+The file ```pew_data.csv``` consists of data from  Pew Research Center polls taken during the 2008 election campaign.  Each row of the dataset includes results on an indivual from a particular U.S. state.  You can read these data into R using the tidy function ```read_csv```.
+
+For each state, estimate the percentatge of the (adult) population who label themselves as "very liberal" using the ideology column, ```ideo```.  For your estiamtes, replicate the procedure for the Poisson-Gamma model that was used in BDA Section 2.7 to estimate cancer rates, that is, treat the number of very liberal respondents as Poisson distributed with an exposure related to the fraction of surveyed individuals (by state).  You don't need to make maps; it will be enough to make scatterplots, plotting the estimate vs. Obama's vote share in 2008.  Graph raw data estimates of the proportion liberal vs.\ Obama vote share, then graph Bayes posterior mean vs.\ Obama vote share.  For both of these plots, the limits of the x and y axes should be the same range. Then make two more graphs: the number of respondents on the x-axis versus the raw proportion very liberal and the inferred proportion very liberal (same x and y limits for both graphs).  That's a total of four graphs.  Put them all on a single page (e.g. using [```patchwork```](https://patchwork.data-imaginist.com/) package in R, ). Obama's vote share can be found in ```2008ElectionResult.csv```.
+
+This exercise has three challenges:  first, manipulating the data in order to get the totals by state; second, replicating the Bayesian calculations to estimate the parameters of the prior distribution and completing the Bayesian analysis by state; third, making the graphs. What do you notice about the Bayesian inferences compared to the raw proportions?
+
+<!-- # Applied problems -->
+
+<!-- ## 4. Basketball Training Program -->
+<!-- A study is performed to estimate the effect of a simple training program on basketball free-throw shooting.  A random sample of 100 college students is recruited into the study.  Each student first shoots 100 free-throws to establish a baseline success probability.  Each student then takes 50 practice shots each day for a month.  At the end of that time, he or she takes 100 shots for a final measurement.  Let $\theta$ be the average improvement in success probability. -->
+
+<!-- Give three prior distributions for $\theta$:  a noninformative prior, a subjective prior based on your best knowledge, and a weakly informative prior.  Explain each in a sentence. -->
