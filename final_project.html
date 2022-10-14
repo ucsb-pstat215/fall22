@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Final Project</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+<script src="final_project_files/libs/clipboard/clipboard.min.js"></script>
+<script src="final_project_files/libs/quarto-html/quarto.js"></script>
+<script src="final_project_files/libs/quarto-html/popper.min.js"></script>
+<script src="final_project_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="final_project_files/libs/quarto-html/anchor.min.js"></script>
+<link href="final_project_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="final_project_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="final_project_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="final_project_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="final_project_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Final Project</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<p>In lieu of a final exam, you are required to complete a final project report. The report will be submitted to gradescope by the final exam day, December 6th. I recommended writing your report in a self-contained quarto document.</p>
+<p>In addition, each student will give a 10 minute class presentation in the last week of the quarter sharing preliminary results from their project (5-10 slides). The overarching goal of this presentation is to expose the class to something new, not covered in class.</p>
+<section id="report-requirements" class="level2">
+<h2 class="anchored" data-anchor-id="report-requirements">Report requirements</h2>
+<ul>
+<li><p>Your report must be at least 10 pages and no more than 20 pages.</p></li>
+<li><p>No more than 2 of your total pages can consist of figures (i.e.&nbsp;you are allowed roughly 4 half-page figures). You can include an appendix for extra figures and descriptions if needed (no length limit). Your report must include at least one figure.</p></li>
+<li><p>Your report must include a “References section” with a list 3 references.</p></li>
+<li><p>Your report must include the analysis of at least one data set. If you need to, you can simulate data, but the best reports will involve real data. You may want to consider the analysis of both real and simulated data.</p></li>
+<li><p>All projects must be completed independently unless you have a strong reason to work together with a partner (instructor approval required).</p></li>
+</ul>
+</section>
+<section id="report-structure" class="level2">
+<h2 class="anchored" data-anchor-id="report-structure">Report structure</h2>
+<p>Here are some sections you <em>can</em> and maybe should include in your paper, but you are not strictly required to follow this format.</p>
+<ul>
+<li><p>Abstract</p></li>
+<li><p>Introduction. Describe relevant background for the project, cite existing work, and clearly state the goals of your project.</p></li>
+<li><p>Data. What is the data that you’re analyzing? Are there missing values? What considerations are important when proposing a sampling model?</p></li>
+<li><p>Methods. Describe the Bayesian model and/or inferential methods that you’ll be using in your project.</p></li>
+<li><p>Results. Include figure(s) clearly demonstrating the results of your data analysis. You can include posterior summaries for relevant model quantities, diagostics indicating model fit, and summaries about the Monte Carlo inference, if appropriate (things like traceplots should go in an Appendix)</p></li>
+<li><p>Conclusion. What did you learn? What worked and what didn’t? What possible follow up analyses are warranted?</p></li>
+</ul>
+</section>
+<section id="project-ideas" class="level2">
+<h2 class="anchored" data-anchor-id="project-ideas">Project ideas</h2>
+<ul>
+<li>Apply a Bayesian approach to analyze data of interest to you. Ideally this is from an existing research project or anticipated thesis proposal.
+<ul>
+<li>Justify the model and the choice of prior distributions. You may want to consider how sensitive the results are to different choices of the prior.</li>
+<li>Check model fit (e.g.&nbsp;with posterior predictive checks) and/or compare different modeals (e.g using the <code>loo</code> package)</li>
+<li>If appropriate, compare your results to those from a non-Bayesian analysis</li>
+<li>Why was a Bayesian approach warranted or useful for this analysis?</li>
+</ul></li>
+</ul>
+<p>Or:</p>
+<ul>
+<li>Write an in depth report on an ``advanced’’ Bayesian topic that was not covered (or covered only superficially) in class. Some possibilities:
+<ul>
+<li>Non-parametric Bayes (e.g.&nbsp;The Dirichlet Process or Indian Buffet Process priors)</li>
+<li>Bayesian Variable Selection<br>
+</li>
+<li>Alternative inferential techniques
+<ul>
+<li>Iterative Nested Laplace Approximation (INLA)</li>
+<li>Sequential Monte Carlo (SMC)</li>
+<li>Riemmanian Manifold HMC</li>
+<li>Variational Bayes methods</li>
+</ul></li>
+<li>Methods for Bayesian Causal Inference</li>
+<li>Models for missing data</li>
+</ul></li>
+</ul>
+<p>Feel free to check with me if you have concerns about the topic for your report!</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
