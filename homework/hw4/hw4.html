@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Alex Franks">
+<meta name="dcterms.date" content="2022-10-23">
+
+<title>MCMC Inference for a Bayesian Logistic Regression Model</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="mcmc_homework_files/libs/clipboard/clipboard.min.js"></script>
+<script src="mcmc_homework_files/libs/quarto-html/quarto.js"></script>
+<script src="mcmc_homework_files/libs/quarto-html/popper.min.js"></script>
+<script src="mcmc_homework_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="mcmc_homework_files/libs/quarto-html/anchor.min.js"></script>
+<link href="mcmc_homework_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="mcmc_homework_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="mcmc_homework_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="mcmc_homework_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="mcmc_homework_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">MCMC Inference for a Bayesian Logistic Regression Model</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Alex Franks </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">October 23, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+</header>
+
+<section id="due-november-6" class="level2">
+<h2 class="anchored" data-anchor-id="due-november-6">Due November 6</h2>
+</section>
+<section id="a-model-for-bee-toxicity" class="level2">
+<h2 class="anchored" data-anchor-id="a-model-for-bee-toxicity">A model for bee toxicity</h2>
+<p>A environmental agency is testing the effects of a pesticide that can cause acute poisoning in bees, the world’s most important pollinator of food crops. The environmental agency collects data on exposure to different levels of the pestidicide in parts per million (ppm). The agency also identifies collapsed beehives, which they expect could be due to acute pesticide poisoning. In the data they collect, each observation is a pair <span class="math inline">\((x_i, y_i)\)</span>, where <span class="math inline">\(x_i\)</span> represents the dosage of the pollutant and <span class="math inline">\(y_i\)</span> represents whether or not the hive survived. Take <span class="math inline">\(y_i=1\)</span> means that the beehive has collapsed from poisoning and <span class="math inline">\(y_i=0\)</span> means the beehive survived. The agency collects data at 20 different sites, each of which was exposed to a different dosages. In addition, the agency observed ``control’’ hives for which there was no pesticide detected at all. None of the control hives experienced collapse. The data for the first ten exposed hives are shown below:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">x</th>
+<th style="text-align: right;">y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">1.06</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.41</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1.85</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.50</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">0.46</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.21</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1.25</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.09</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">1.76</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">1.75</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Assume that beehive collapse, <span class="math inline">\(y_i\)</span>, given pollutant exposure level <span class="math inline">\(x_i\)</span>, is <span class="math inline">\(Y_i \sim \text{Bernoulli}(\theta(x_i))\)</span>, where <span class="math inline">\(\theta(x_i)\)</span> is the probability of death given dosage <span class="math inline">\(x_i\)</span>. We will assume the logistic regression model, <span class="math inline">\(\text{logit}(\theta_i(x_i)) = \alpha + \beta x_i\)</span> where <span class="math inline">\(\text{logit}(\theta)\)</span> is defined as <span class="math inline">\(\text{log}(\theta / (1-\theta))\)</span>.</p>
+<p><strong>1a</strong> The dose at which there is a 50% chance of beehvive collapse, <span class="math inline">\(\theta(x_i) = 0.5\)</span>, is known as LD50 (“lethal dose 50%”), and is often of interest in toxicology studies. We will use <span class="math inline">\(\gamma\)</span> to denote the LD50. Solve for <span class="math inline">\(\gamma\)</span> as a function of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>.</p>
+<p><strong>1b</strong>. Environmentalist prefer to specify their prior knowledge in terms of <span class="math inline">\(\gamma\)</span> and <span class="math inline">\(\alpha\)</span> (as opposed to <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span>) due to the interpretability of these parameters. Write the likelihood for the proposed model in terms of <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\gamma\)</span>.</p>
+<p><strong>1c</strong> Environmentalists think a priori that <span class="math inline">\(\gamma\)</span> is positive and centered around 1ppm. State why it doesn’t make sense for <span class="math inline">\(\gamma\)</span> to be negative and propose a Gamma prior for <span class="math inline">\(\gamma\)</span> with positive support, centered near 1ppm with appropriate uncertainty. State the parameters of your prior and justify in 1-2 sentences.</p>
+<p><strong>1d</strong>. State the interpretation for <span class="math inline">\(\alpha\)</span> in terms of hive collapse and toxic exposure. Assume we are certain that the pesticide cannot reduce the probability of beehive collapse. State what the above assumption implies about the prior support for <span class="math inline">\(\alpha\)</span>. Assume an improper uniform prior on the support of <span class="math inline">\(\alpha\)</span>.</p>
+<p><strong>1e</strong> Write down the posterior density up to a proportionality constant. Fill in the template code below, which should return the log posterior density evaluated at any (<span class="math inline">\(\alpha\)</span>, <span class="math inline">\(\gamma\)</span>) given the data provided.</p>
+<p>As a reminder, the posterior density may have <em>extremely</em> small values, especially when we initialize the sampler and may be far from the high posterior mode areas. For example, computing the ratio of a normal density 1000 standard deviations from the mean to a normal density 1001 standard deviations from the mean fails because in both cases <code>dnorm</code> evalutes to 0 due to numerical underflow and 0/0 returns NaN. However, we can compute the log ratio of densities:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="dv">1000</span>) <span class="sc">/</span> <span class="fu">dnorm</span>(<span class="dv">1001</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NaN</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dnorm</span>(<span class="dv">1000</span>, <span class="at">log=</span><span class="cn">TRUE</span>) <span class="sc">-</span> <span class="fu">dnorm</span>(<span class="dv">1001</span>, <span class="at">log=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1000.5</code></pre>
+</div>
+</div>
+<p>Fill in the code below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Log posterior function.  </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, gamma) {</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Compute the probabilities as a function of alpha and beta </span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## for the observed x, y data</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="implementing-the-metropolis-hastings-algotihm" class="level2">
+<h2 class="anchored" data-anchor-id="implementing-the-metropolis-hastings-algotihm">Implementing the Metropolis-Hastings Algotihm</h2>
+<p>Let <span class="math inline">\(r = \text{min}(1, \frac{p(\theta^*|y)}{p(\theta_t|y)}\frac{J(\theta_t|\theta^*)}{J(\theta^*|\theta_t)})\)</span>. In the accept/reject step of the your implementation of the MH algorithm checking <span class="math inline">\(u &lt; r\)</span> is equivalent to checking whether <span class="math inline">\(log(u) &lt; log(r)\)</span>. Completing the accept/reject on the log scale will avoid any underflow issues and prevent our code from crashing.</p>
+<p>Complete the Metropolis-Hastings sampler by filling in the missing pieces of the algorithm below. <code>theta_0</code> is a vector of length 2, with the first argument as the initial <span class="math inline">\(\alpha\)</span> value and the second argument as the initial <span class="math inline">\(\gamma\)</span> value. As your proposal, use <span class="math inline">\(J(\theta*|\theta_t) \sim Normal(\theta_t, \Sigma)\)</span>. You can sample from the multivariate normal using <code>mvtnorm::rmvnorm</code>. The effectiveness of your sampler will be determined by the tuning parameter, <span class="math inline">\(\Sigma\)</span>, the covariance of the bivariate normal distribution. This determines the size / shape of the proposal. Set <span class="math inline">\(\Sigma\)</span> using the <code>cov</code> argument in your sampler.</p>
+<p>Burn in your sampler for 10000 iterations and then save 10000 samples after burnin. Report a 95% credible region for LD50 and report the effective sample size for <span class="math inline">\(\gamma\)</span> (you can use<code>coda::effectiveSize</code> function). See if you can improve upon this effective sample size from your first run by finding a new setting for <code>cov</code>. What’s the best effective sample size you were able to achieve? <em>Hint</em>: make a traceplot of the samples and/or compute the acceptance rate to identify if your proposal variance is too large or too small. We recommend using <a href="http://mc-stan.org/bayesplot/"><code>bayesplot</code></a>. What is the largest effective size for <span class="math inline">\(\gamma\)</span> that you were able to achieve? Save the effective sample size of <span class="math inline">\(\gamma\)</span> in a variable called <code>ld50_ess_mh</code>.</p>
+<pre><code>BEGIN QUESTION
+name: q2b
+manual: true</code></pre>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Metropolis-Hastings for the Logistic Model</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">###############################################</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="do">## Function to generate samples using the Metropolis-Hasting Sampler</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="do">## burnin: amount of iterations to discard to reduce dependence on starting point</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="do">## samples: total number of samples after burnin</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="do">## theta_0: initialization of the form c(alpha_init, beta_init) for some values alpha_init, beta_init</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="do">## cov: covariance of the Gaussian proposal density</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>mh_logistic <span class="ot">&lt;-</span> <span class="cf">function</span>(samples, burnin, <span class="at">theta_0=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">cov=</span><span class="fu">diag</span>(<span class="dv">2</span>)){</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Initialize parameters.</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>    theta_t <span class="ot">&lt;-</span> theta_0</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Create a matrix where we will store samples</span></span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    theta_out <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow=</span>burnin<span class="sc">+</span>samples, <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">dimnames=</span><span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span>(burnin <span class="sc">+</span> samples), <span class="fu">c</span>(<span class="st">"alpha"</span>, <span class="st">"gamma"</span>)))</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(burnin<span class="sc">+</span>samples)){</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>        <span class="do">## MH Algorithm here</span></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>              </span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>        <span class="do">## Save the draw</span></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>        theta_out[i, ] <span class="ot">&lt;-</span> <span class="cn">NULL</span> <span class="co"># new theta_t goes here</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="do">## Chop off the first part of the chain -- this reduces dependence on the starting point.</span></span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span>(burnin <span class="sc">==</span> <span class="dv">0</span>)</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>      theta_out</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>      theta_out[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burnin), ]</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a><span class="do">## Report 95% credible region, effective size, and traceplots</span></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="re">BEGIN</span><span class="co"> SOLUTION</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">mh_logistic</span>(<span class="dv">10000</span>, <span class="dv">10000</span>, <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>ld50_ess_mh <span class="ot">&lt;-</span> <span class="cn">NULL</span> <span class="co"># Save effective sample Size of ld50 here</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="problem-2.-implementing-your-own-hamiltonian-monte-carlo" class="level2">
+<h2 class="anchored" data-anchor-id="problem-2.-implementing-your-own-hamiltonian-monte-carlo">Problem 2. Implementing your own Hamiltonian Monte Carlo</h2>
+<p><strong>2a</strong>. Hamiltonian Monte Carlo can improve upon “vanilla” Metropolis-Hastings by leveraging information about the gradient of the posterior. Write out the gradient of the log posterior and fill in the function below. The function should return the gradient of the log posterior at any point in the parameter space.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Return the gradient as a vector of length 2</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co"># first element is dl/dalpha and second is dl/dgamma</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>grad_log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, gamma){</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="do">## Fill in</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can use the following code, which computes a numeric approximation to the derivative, to test that we computed our derivative correctly. This numeric approximation is about 5x slower than the exact derivative (if interested, you can benchmark the run time of the functions yourself using <code>microbenchmark</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>numeric_grad_log_posterior <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, gamma, eps){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  alpha_deriv <span class="ot">&lt;-</span> (<span class="fu">log_posterior</span>(alpha<span class="sc">+</span>eps, gamma) <span class="sc">-</span> <span class="fu">log_posterior</span>(alpha<span class="sc">-</span>eps, gamma))<span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>eps)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  gamma_deriv <span class="ot">&lt;-</span> (<span class="fu">log_posterior</span>(alpha, gamma <span class="sc">+</span> eps) <span class="sc">-</span> <span class="fu">log_posterior</span>(alpha, gamma <span class="sc">-</span> eps))<span class="sc">/</span>(<span class="dv">2</span><span class="sc">*</span>eps)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(alpha_deriv, gamma_deriv)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Evaluate the cell below to test that your derivative is correct.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">"q1b"</span>, {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_equal</span>(<span class="fu">grad_log_posterior</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">1</span>), </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>               <span class="fu">numeric_grad_log_posterior</span>(<span class="sc">-</span><span class="dv">10</span>, <span class="dv">1</span> , <span class="at">eps=</span><span class="fl">1e-6</span>), <span class="at">tol=</span><span class="fl">1e-4</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="fu">test_that</span>(<span class="st">"q1b"</span>, {</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">expect_equal</span>(<span class="fu">grad_log_posterior</span>(<span class="sc">-</span><span class="dv">15</span>, <span class="dv">2</span>), </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>               <span class="fu">numeric_grad_log_posterior</span>(<span class="sc">-</span><span class="dv">15</span>, <span class="dv">2</span>, <span class="at">eps=</span><span class="fl">1e-6</span>), <span class="at">tol=</span><span class="fl">1e-4</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>2b</strong>. In the function skeleton provided, implement an HMC sampler. At each iteration, use <span class="math inline">\(L=10\)</span> leapfrog steps with <span class="math inline">\(\epsilon=0.1\)</span> as the suggested defaults in BDA. Set the mass matrix to the identity. Save the effective sample size of <span class="math inline">\(\gamma\)</span> in a variable called <code>ld50_ess_hmc</code>. If you like, experiment with different mass matrices and find a mass matrix which maximizes the effective sample size.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#' Title</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param samples </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param burnin </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param log_post </span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param grad_log_post </span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param init </span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param mass_mat </span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param L </span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co">#' @param eps </span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co">#' @return</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co">#' @export</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="co">#'</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a><span class="co">#' @examples</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>hmc <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">samples=</span><span class="dv">10000</span>, <span class="at">burnin=</span>samples, log_post, grad_log_post, <span class="at">init=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), <span class="at">mass_mat=</span><span class="fu">diag</span>(<span class="fu">length</span>(init)), <span class="at">L=</span><span class="dv">100</span>, <span class="at">eps=</span><span class="dv">1</span>) {</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  accepts <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span>, samples<span class="sc">+</span>burnin)</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>  samps <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">0</span>, <span class="at">nrow=</span>samples<span class="sc">+</span>burnin, <span class="at">ncol=</span><span class="dv">2</span>, <span class="at">dimnames=</span><span class="fu">list</span>(<span class="dv">1</span><span class="sc">:</span>(burnin<span class="sc">+</span>samples), <span class="fu">c</span>(<span class="st">"alpha"</span>, <span class="st">"gamma"</span>)))</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  pars <span class="ot">&lt;-</span> init</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(iter <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>(samples<span class="sc">+</span>burnin)){</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="do">## HMC Alg here</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    samps[iter, ] <span class="ot">&lt;-</span> <span class="cn">NULL</span> <span class="do">## theta_t here</span></span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span>(burnin <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>    samps <span class="ot">&lt;-</span> samps[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burnin), ]</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    accepts <span class="ot">&lt;-</span> accepts[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span>burnin)]</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">list</span>(<span class="at">samps=</span>samps, <span class="at">accepts=</span>accepts))</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mass_mat <span class="ot">&lt;-</span> <span class="fu">diag</span>(<span class="dv">2</span>) </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>L <span class="ot">&lt;-</span> <span class="dv">10</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> .<span class="dv">1</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">hmc</span>(<span class="at">samples=</span><span class="dv">10000</span>, <span class="at">burnin=</span><span class="dv">1000</span>, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>           log_posterior, grad_log_posterior, <span class="at">init=</span><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>), </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>           <span class="at">mass_mat=</span>mass_mat, <span class="at">L=</span>L, <span class="at">eps=</span>eps)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>ld50_ess_hmc <span class="ot">&lt;-</span> <span class="cn">NULL</span> <span class="do">## ESS for ld50 in HMC</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="stan-implementation" class="level2">
+<h2 class="anchored" data-anchor-id="stan-implementation">Stan implementation</h2>
+<p><strong>3a</strong>. Now implement your model in stan and run one chain with a warmup of 10000 and generate 10000 samples just as above. Save the effective sample size of <span class="math inline">\(\gamma\)</span> in a variable called <code>ld50_ess_nuts</code>. Make a scatter plot with <span class="math inline">\(\alpha\)</span> samples on the x-axis and <span class="math inline">\(\gamma\)</span>-samples on the y-axis (e.g using <code>bayesplot::mcmc_scatter</code>). Explain why the shape of the posterior dependence between <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\gamma\)</span> makes sense.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ld50_ess_nuts <span class="ot">&lt;-</span> <span class="cn">NULL</span> <span class="do">## ESS from Stan</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>3b</strong>. Comparing the effective size from all iterations</p>
+<p>The effective sample sizes for each implementation are:</p>
+<div class="cell">
+
+</div>
+<p>Give at least two reasons why looking at effective sample size alone is not enough to tell us which algorithm is performed the best.</p>
+</section>
+<section id="visualizing-uncertainty-in-the-inferred-regression-function" class="level2">
+<h2 class="anchored" data-anchor-id="visualizing-uncertainty-in-the-inferred-regression-function">Visualizing uncertainty in the inferred regression function</h2>
+<p>In this part, we will use the MCMC samples from Stan to plot the posterior distribution of <span class="math inline">\(\theta(x_i)\)</span> as a function of <span class="math inline">\(x\)</span>. We’ll make the plot on a grid of values from 0.5 to 2.</p>
+<p>The following code generates a dataframe where the hive death probabilities are computed for each of the 10000 samples. What is <code>purrr::map2</code> and <code>unnest</code> doing here?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>xgrid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.5</span>, <span class="dv">2</span>, <span class="at">by=</span><span class="fl">0.1</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>compute_prob <span class="ot">&lt;-</span> <span class="cf">function</span>(alpha, gamma) { <span class="fu">exp</span>(alpha <span class="sc">-</span> alpha<span class="sc">/</span>gamma<span class="sc">*</span>xgrid) <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">+</span> <span class="fu">exp</span>(alpha <span class="sc">-</span> alpha<span class="sc">/</span>gamma<span class="sc">*</span>xgrid))}</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> stan_res <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread_draws</span>(alpha, gamma) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">x=</span><span class="fu">list</span>(xgrid), </span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">prob=</span><span class="fu">map2</span>(alpha, gamma,  compute_prob)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(<span class="fu">c</span>(x, prob)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Use <a href="https://mjskay.github.io/ggdist/articles/lineribbon.html">geom_lineribbon</a> to plot the posterior distribution of <span class="math inline">\(\theta\)</span> as a ribbon plot.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
