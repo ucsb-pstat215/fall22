@@ -1,0 +1,55 @@
+---
+title: "Homework 5"
+author: "Name Here"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(testthat)
+library(mvtnorm)
+library(tidyverse)
+library(tidybayes)
+library(coda)
+library(xtable)
+```
+
+## Due November 21
+
+## A model for bee toxicity
+
+Again consider the bee toxicity problem from the previous homework.  The data on toxicity levels and hive collapse is given again below for convince.  
+
+```{r data, echo=FALSE}
+xprime <- c(1.06, 1.41, 1.85, 1.5, 0.46, 1.21, 1.25, 1.09, 
+       1.76, 1.75, 1.47, 1.03, 1.1, 1.41, 1.83, 1.17, 
+       1.5, 1.64, 1.34, 1.31)
+yprime <- c(0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
+       1, 0, 0, 1, 1, 0, 0, 1, 1, 0)
+x <- c(xprime, rep(0, 20))
+y <- c(yprime, rep(0, 20))
+
+knitr::kable(head(tibble(x=x, y=y), n=10))
+```
+
+Assume that beehive collapse, $y_i$, given pollutant exposure level $x_i$, is $Y_i \sim \text{Bernoulli}(\theta(x_i))$, where $\theta(x_i)$ is the probability of death given dosage $x_i$.  We will assume the *probit* regression model, $\theta_i(x_i) = \Phi(\alpha + \beta x_i)$ where $\Phi$ denotes the CDF of a standard normal distribution. Probit regression has a simple latent variable interpretation that is particularly amenable to Gibbs sampling. We will implement the Gibbs sampler by deriving the complete conditionals in a model where we have added additional augmented paramters, $z_i$.  
+
+**1a** Let $z_i \sim N(\alpha + \beta x_i, 1)$.  Show that $y_i = I[z_i>0]$ (1 if $z_i$ is greater than 0, and 0 otherwise) implies the probit model above.  
+
+**1b**. Derive the complete conditionals $p(\alpha \mid z, y, x, \beta)$  and $p(\beta \mid z, y, x, \alpha)$ assuming a flat prior on $\alpha$ and $\beta$.
+
+**1c** Now derive the complete conditionals of $\alpha$ and $\beta$ assuming instead assuming a priori $\alpha \sim N(-10, \sigma=5)$ and $\sim N(0, \sigma=10)$ (note: standard deviations are provided not variances).
+
+**1c** Derive the complete conditional of $z_i$, $p(z_i \mid z_{-i}, y, x, \alpha, \beta)$. Find an R package or function that you can use to sample from this density and report the package you plan to use.
+
+**1d**.  Use the above conditionals, assuming the normal priors on $\alpha$ and $\beta$, and implement and run a Gibbs sampler with multiple chains.  Run the sampler long enough so that the effective sample size for all parameters is at least 1000 and discuss mixing.  Report at 95\% confidence interval for the LD50 and report the posterior probability that LD50 is greater than 1.2.
+
+## Variational Inference
+
+
+**2a** Assume a mean-field variational approximation $g$ to $p(\alpha, \beta, z_1, ..., z_n \mid y_1, ... y_n, x_1, ... x_n)$ that is independent in its $n + 2$ dimensions.  Determine the functional form of each of the factors in $g$.  To do so, start by writing the log posterior density (up to an arbitrary constant) and considering expectations.
+
+**2b** Implement the variational Bayes algorithm and run it on the beehive data.  Make a plot of the ELBO at each iteration which shows convergence.
+
+**2c** Report the approximate posterior 95\% intervals for $\alpha$, $\beta$ and the LD50 based on samples from your variational approximation.  Comment on the accuracy of the VB method for $\alpha$, $\beta$ and LD50 in terms of capturing reasonable point estimates as well as correctly measuring uncertainty.  
+
